@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#08080d">
+  <title>AXEL.AI — Think. Create. Evolve.</title>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #08080d;
+      --panel: rgba(20,20,30,.75);
+      --border: rgba(255,255,255,.1);
+      --text: #f7f7fb;
+      --muted: #9898a9;
+      --purple: #9b8cff;
+      --blue: #65c8ff;
+      --green: #67e8a5;
+    }
+
+    html, body {
+      min-width: 320px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 15% 10%, rgba(123,97,255,.16), transparent 32rem),
+        radial-gradient(circle at 85% 15%, rgba(101,200,255,.09), transparent 30rem),
+        #08080d;
+    }
+
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: rgba(8,8,13,.75);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+
+    .logo {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: linear-gradient(145deg, #242039, #11111a);
+      border: 1px solid rgba(155,140,255,.35);
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px rgba(103,232,165,.8);
+    }
+
+    main {
+      width: min(860px, calc(100% - 28px));
+      margin: auto;
+      padding: 92px 0 150px;
+    }
+
+    .welcome {
+      text-align: center;
+      padding-top: 40px;
+    }
+
+    .welcome.hide {
+      display: none;
+    }
+
+    .big-logo {
+      width: 72px;
+      height: 72px;
+      margin: auto;
+      display: grid;
+      place-items: center;
+      border-radius: 22px;
+      font-size: 34px;
+      font-weight: 800;
+      background: linear-gradient(145deg, #242039, #11111a);
+      border: 1px solid rgba(155,140,255,.35);
+      box-shadow: 0 0 40px rgba(123,97,255,.15);
+    }
+
+    .welcome h1 {
+      margin-top: 22px;
+      font-size: clamp(30px, 8vw, 48px);
+      letter-spacing: -.05em;
+    }
+
+    .welcome p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .prompts {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 26px;
+    }
+
+    .prompt {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color: #c9c8d4;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .prompt:hover {
+      border-color: rgba(155,140,255,.5);
+      color: #fff;
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding-top: 20px;
+    }
+
+    .row {
+      display: flex;
+      animation: appear .3s ease;
+    }
+
+    .row.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 86%;
+      padding: 13px 15px;
+      border-radius: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .row.user .bubble {
+      background: rgba(28,49,66,.8);
+      border-color: rgba(101,200,255,.2);
+    }
+
+    .typing {
+      display: inline-flex;
+      gap: 5px;
+      padding: 15px 17px;
+      border-radius: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+    }
+
+    .typing span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--purple);
+      animation: bounce 1s infinite;
+    }
+
+    .typing span:nth-child(2) { animation-delay: .15s; }
+    .typing span:nth-child(3) { animation-delay: .3s; }
+
+    .dock {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
+      background: linear-gradient(to top, #08080d 65%, transparent);
+    }
+
+    .composer {
+      width: min(860px, 100%);
+      margin: auto;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 20px;
+      background: rgba(20,20,30,.85);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    }
+
+    textarea {
+      flex: 1;
+      min-height: 42px;
+      max-height: 140px;
+      padding: 11px 10px;
+      border: 0;
+      outline: 0;
+      resize: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    textarea::placeholder {
+      color: #737383;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .send {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: linear-gradient(145deg, var(--purple), #7b61ff);
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .footer {
+      width: min(860px, 100%);
+      margin: 8px auto 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #6e6e7d;
+    }
+
+    .clear {
+      background: none;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: .4; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    @media (max-width: 600px) {
+      main { padding-bottom: 150px; }
+      .bubble { max-width: 92%; font-size: 13px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">A</div>
+      AXEL.AI
+    </div>
+
+    <div class="status">
+      <div class="dot"></div>
+      LOCAL AI
+    </div>
+  </header>
+
+  <main>
+    <section class="welcome" id="welcome">
+      <div class="big-logo">A</div>
+      <h1>What can I help you with?</h1>
+      <p>Ask AXEL anything. Simple, fast, and always ready.</p>
+
+      <div class="prompts">
+        <button class="prompt" data-text="Who are you?">Who are you?</button>
+        <button class="prompt" data-text="Explain AI">Explain AI</button>
+        <button class="prompt" data-text="Create an idea">Create an idea</button>
+        <button class="prompt" data-text="Help me code">Help me code</button>
+        <button class="prompt" data-text="Business idea">Business idea</button>
+        <button class="prompt" data-text="Tell me something">Tell me something</button>
+      </div>
+    </section>
+
+    <section class="chat" id="chat"></section>
+  </main>
+
+  <section class="dock">
+    <form class="composer" id="composer">
+      <textarea
+        id="input"
+        rows="1"
+        placeholder="Message AXEL.AI..."
+        aria-label="Message AXEL.AI"
+      ></textarea>
+
+      <button class="send" type="submit" aria-label="Kirim pesan">↑</button>
+    </form>
+
+    <div class="footer">
+      <span>AXEL.AI • Local assistant • No backend required</span>
+      <button class="clear" id="clear" type="button">Clear chat</button>
+    </div>
+  </section>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const welcome = document.getElementById("welcome");
+    const form = document.getElementById("composer");
+    const input = document.getElementById("input");
+    const clearButton = document.getElementById("clear");
+
+    let history = [];
+    let busy = false;
+
+    function addMessage(role, text) {
+      const row = document.createElement("div");
+      row.className = "row " + role;
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+
+      row.appendChild(bubble);
+      chat.appendChild(row);
+
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+
+    function showTyping() {
+      const row = document.createElement("div");
+      row.className = "row axel";
+      row.id = "typing";
+
+      row.innerHTML = `
+        <div class="typing">
+          <span></span><span></span><span></span>
+        </div>
+      `;
+
+      chat.appendChild(row);
+
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+
+    function removeTyping() {
+      const typing = document.getElementById("typing");
+      if (typing) typing.remove();
+    }
+
+    async function axel(userMessage, chatHistory) {
+      const response = await fetch("/api/axel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          history: chatHistory
+        })
+      });
+
+      const data = await response.json();
+
+      return data.reply || "Maaf, AXEL belum bisa menjawab sekarang.";
+    }
+
+    async function sendMessage(text) {
+      const message = text.trim();
+
+      if (!message || busy) return;
+
+      busy = true;
+      welcome.classList.add("hide");
+
+      addMessage("user", message);
+
+      history.push({
+        role: "user",
+        text: message
+      });
+
+      input.value = "";
+      resizeTextarea();
+
+      showTyping();
+
+      try {
+        const reply = await axel(message, history.slice(-10));
+
+        removeTyping();
+        addMessage("axel", reply);
+
+        history.push({
+          role: "model",
+          text: reply
+        });
+
+        localStorage.setItem("axel-chat", JSON.stringify(history.slice(-40)));
+      } catch (error) {
+        removeTyping();
+        addMessage("axel", "Koneksi ke AXEL terganggu. Coba lagi sebentar.");
+      }
+
+      busy = false;
+      input.focus();
+    }
+
+    function resizeTextarea() {
+      input.style.height = "auto";
+      input.style.height = Math.min(input.scrollHeight, 140) + "px";
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      sendMessage(input.value);
+    });
+
+    input.addEventListener("input", resizeTextarea);
+
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage(input.value);
+      }
+    });
+
+    document.querySelectorAll(".prompt").forEach(function (button) {
+      button.addEventListener("click", function () {
+        sendMessage(button.dataset.text);
+      });
+    });
+
+    clearButton.addEventListener("click", function () {
+      if (!history.length) return;
+
+      if (!confirm("Hapus semua percakapan AXEL.AI?")) return;
+
+      history = [];
+      chat.innerHTML = "";
+      welcome.classList.remove("hide");
+      localStorage.removeItem("axel-chat");
+    });
+
+    try {
+      const saved = JSON.parse(localStorage.getItem("axel-chat") || "[]");
+
+      if (Array.isArray(saved) && saved.length) {
+        history = saved;
+
+        saved.forEach(function (item) {
+          addMessage(
+            item.role === "user" ? "user" : "axel",
+            item.text
+          );
+        });
+
+        welcome.classList.add("hide");
+      }
+    } catch (error) {
+      history = [];
+    }
+
+    resizeTextarea();
+  </script>
+</body>
+</html>
